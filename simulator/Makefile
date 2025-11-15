@@ -1,10 +1,17 @@
 DEBUG = 0
 
+ifeq ($(INTEL), 1)
+ARCHS = x86_64
 SDKVERSION = 16.2
 SYSROOT = $(THEOS)/sdks/iPhoneSimulator16.2.sdk
-
-ARCHS = x86_64
 TARGET = simulator:clang
+else
+ARCHS = arm64
+SDKVERSION = 16.2
+SYSROOT = $(THEOS)/sdks/iPhoneSimulator16.2.sdk
+TARGET = simulator:clang
+#CFLAGS += -DNEW_API
+endif
 
 # FULL PATH of the FLEX repo on your own machine
 FLEX_ROOT = ../libflex/FLEX
@@ -34,6 +41,19 @@ $(TWEAK_NAME)_CCFLAGS += -std=gnu++11
 include $(THEOS)/makefiles/common.mk
 include $(THEOS_MAKE_PATH)/tweak.mk
 
+uni::stage
+	rm -f ./$(TWEAK_NAME).dylib
+	@echo "==> Creating universal binary…"
+	lipo -create \
+		$(THEOS_OBJ_DIR)/arm64/*.dylib \
+		$(THEOS_OBJ_DIR)/x86_64/*.dylib \
+		-output $(TWEAK_NAME).dylib
+
+	cp ./$(TWEAK_NAME).dylib /opt/simject/$(TWEAK_NAME).dylib
+	cp -f ./$(TWEAK_NAME).plist /opt/simject/$(TWEAK_NAME).plist
+	ldid -S /opt/simject/$(TWEAK_NAME).dylib
+	/opt/simject/bin/resim
+
 sim::stage
 	rm -f /opt/simject/$(TWEAK_NAME).dylib
 	rm -f /opt/simject/$(TWEAK_NAME).plist
@@ -41,6 +61,8 @@ sim::stage
 	cp -f ./$(TWEAK_NAME).plist /opt/simject/$(TWEAK_NAME).plist
 	ldid -S /opt/simject/$(TWEAK_NAME).dylib
 	/opt/simject/bin/resim
-clean::clean all
+
+clear::stage
+	rm -f $(TWEAK_NAME).dylib
 	rm -f /opt/simject/$(TWEAK_NAME).dylib
 	rm -f /opt/simject/$(TWEAK_NAME).plist

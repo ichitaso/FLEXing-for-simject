@@ -84,3 +84,19 @@ extern SEL show;
 @property (setter=_setPrefersScrollingExpandsToLargerDetentWhenScrolledToEdge:)
            BOOL _prefersScrollingExpandsToLargerDetentWhenScrolledToEdge;
 @end
+
+@interface _UIStatusBarForegroundView : UIView
+- (BOOL)isGestureRecognizerAdded;
+- (void)setGestureRecognizerAdded:(BOOL)added;
+@end
+
+@interface _UIStatusBarActionGestureRecognizer : UIGestureRecognizer
+@end
+
+@interface UIStatusBarManager (Private)
+- (void)handleTapAction:(UIStatusBarTapAction *)action;
+- (void)addGestureRecognizer:(id)arg;
+@end
+
+@interface _UIStatusBarAction : NSObject
+@end

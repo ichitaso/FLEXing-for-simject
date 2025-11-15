@@ -7,3 +7,5 @@ obj
 .DS_Store
 /FLEX.xcworkspace
 packages/
+simulator/1.0.0/
+simulator/*.dylib
